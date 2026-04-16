@@ -10,7 +10,20 @@ fn convert(base: &u8, current_base: &u8, to_convert: &[u8]) -> String {
         reconstructed += (*value as u64) * (*current_base as u64).pow(exp);
     }
     
-    return reconstructed.to_string();
+    let mut new_number = String::new();
+
+    while reconstructed > 0 {
+        let remainder = (reconstructed % *base as u64) as u8;
+        if remainder < 10 {
+            new_number += &((remainder + ZERO_CHAR_OFFSET) as u8 as char).to_string();
+        } else {
+            new_number += &((remainder + A_CHAR_OFFSET - 10) as u8 as char).to_string();
+        }
+
+        reconstructed /= *base as u64;
+    }
+
+    return new_number;
 }
 
 fn arrayify(to_make: String) -> Vec<u8> {
@@ -44,8 +57,8 @@ fn main() {
         println!("Enter the number you want to convert:");
         io::stdin().read_line(&mut to_convert).expect("Failed to read line!");
 
-        let base_u8 = base.parse::<u8>().expect("Failed to parse target base!");
-        let current_base_u8 = current_base.parse::<u8>().expect("Failed to parse base of input number!");
+        let base_u8 = base.trim().parse::<u8>().expect("Failed to parse target base!");
+        let current_base_u8 = current_base.trim().parse::<u8>().expect("Failed to parse base of input number!");
 
         let arrayified = arrayify(to_convert.trim().to_uppercase().to_string());
 
@@ -56,6 +69,6 @@ fn main() {
             }
         }
 
-        println!("{} in base {} converted to {} in base {}", to_convert, current_base_u8, convert(&base_u8, &current_base_u8, &arrayified), base_u8);
+        println!("{} in base {} converted to {} in base {}", to_convert.trim(), current_base_u8, convert(&base_u8, &current_base_u8, &arrayified), base_u8);
     }
 }
